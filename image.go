@@ -36,9 +36,9 @@ func GenerateImageName(defaultDomain, defaultNamespace, name string) string {
 		// no slash, add default registry
 		if defaultNamespace != "" {
 			return defaultDomain + "/" + defaultNamespace + "/" + name
-		} else {
-			return defaultDomain + "/" + name
 		}
+
+		return defaultDomain + "/" + name
 	default:
 		prefix := name[:firstSlashIndex]
 		if strings.Contains(prefix, ".") {
