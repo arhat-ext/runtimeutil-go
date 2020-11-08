@@ -28,11 +28,17 @@ const (
 // GenerateImageName create a image name with defaults according to provided name
 // defaultDomain MUST NOT be empty
 func GenerateImageName(defaultDomain, defaultNamespace, name string) string {
+	defaultDomain = strings.TrimRight(defaultDomain, "/")
+
 	firstSlashIndex := strings.IndexByte(name, '/')
 	switch firstSlashIndex {
 	case -1:
 		// no slash, add default registry
-		return defaultDomain + "/" + defaultNamespace + "/" + name
+		if defaultNamespace != "" {
+			return defaultDomain + "/" + defaultNamespace + "/" + name
+		} else {
+			return defaultDomain + "/" + name
+		}
 	default:
 		prefix := name[:firstSlashIndex]
 		if strings.Contains(prefix, ".") {
