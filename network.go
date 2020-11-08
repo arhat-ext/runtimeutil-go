@@ -1,3 +1,19 @@
+/*
+Copyright 2020 The arhat.dev Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package runtimeutil
 
 import (
@@ -20,7 +36,12 @@ options {{- range .Options }} {{ . }} {{- end -}}
 `
 
 // DelegateExecFunc execute abbot command with provided environment variables and io channel
-type DelegateExecFunc func(env map[string]string, stdin io.Reader, stdout, stderr io.Writer) error
+type DelegateExecFunc func(
+	ctx context.Context,
+	env map[string]string,
+	stdin io.Reader,
+	stdout, stderr io.Writer,
+) error
 
 func NewNetworkClient(exec DelegateExecFunc) *NetworkClient {
 	return &NetworkClient{
@@ -68,10 +89,16 @@ func (c *NetworkClient) Do(
 	buf := new(bytes.Buffer)
 	errBuf := new(bytes.Buffer)
 
-	err = c.execAbbot(map[string]string{
-		"ABBOT_REQ_CONTAINER_ID":  containerID,
-		"ABBOT_REQ_CONTAINER_PID": strconv.FormatInt(pid, 10),
-	}, bytes.NewReader(abbotReqData), buf, errBuf)
+	err = c.execAbbot(
+		ctx,
+		map[string]string{
+			"ABBOT_REQ_CONTAINER_ID":  containerID,
+			"ABBOT_REQ_CONTAINER_PID": strconv.FormatInt(pid, 10),
+		},
+		bytes.NewReader(abbotReqData),
+		buf,
+		errBuf,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -82,4 +109,83 @@ func (c *NetworkClient) Do(
 	}
 
 	return buf.Bytes(), nil
+}
+
+func (c *NetworkClient) Restore(
+	ctx context.Context, pid int64, containerID string,
+) error {
+	errBuf := new(bytes.Buffer)
+	err := c.execAbbot(
+		ctx,
+		map[string]string{
+			"ABBOT_REQ_CONTAINER_ID":  containerID,
+			"ABBOT_REQ_CONTAINER_PID": strconv.FormatInt(pid, 10),
+			"ABBOT_REQ_ACTION":        "container:restore",
+		},
+		nil,
+		nil,
+		errBuf,
+	)
+	if err != nil {
+		return err
+	}
+
+	errStr := errBuf.String()
+	if len(errStr) != 0 {
+		return fmt.Errorf(errStr)
+	}
+
+	return nil
+}
+
+func (c *NetworkClient) Query(ctx context.Context, pid int64, containerID string) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	errBuf := new(bytes.Buffer)
+
+	err := c.execAbbot(
+		ctx,
+		map[string]string{
+			"ABBOT_REQ_CONTAINER_ID":  containerID,
+			"ABBOT_REQ_CONTAINER_PID": strconv.FormatInt(pid, 10),
+			"ABBOT_REQ_ACTION":        "container:query",
+		},
+		nil,
+		buf,
+		errBuf,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	errStr := errBuf.String()
+	if len(errStr) != 0 {
+		return nil, fmt.Errorf(errStr)
+	}
+
+	return buf.Bytes(), nil
+}
+
+func (c *NetworkClient) Delete(ctx context.Context, pid int64, containerID string) error {
+	errBuf := new(bytes.Buffer)
+	err := c.execAbbot(
+		ctx,
+		map[string]string{
+			"ABBOT_REQ_CONTAINER_ID":  containerID,
+			"ABBOT_REQ_CONTAINER_PID": strconv.FormatInt(pid, 10),
+			"ABBOT_REQ_ACTION":        "container:delete",
+		},
+		nil,
+		nil,
+		errBuf,
+	)
+	if err != nil {
+		return err
+	}
+
+	errStr := errBuf.String()
+	if len(errStr) != 0 {
+		return fmt.Errorf(errStr)
+	}
+
+	return nil
 }

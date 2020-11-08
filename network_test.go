@@ -17,6 +17,7 @@ limitations under the License.
 package runtimeutil
 
 import (
+	"context"
 	"io"
 	"testing"
 
@@ -24,9 +25,16 @@ import (
 )
 
 func TestNetworkClient_CreateResolvConf(t *testing.T) {
-	client := NewNetworkClient(func(env map[string]string, stdin io.Reader, stdout, stderr io.Writer) error {
-		return nil
-	})
+	client := NewNetworkClient(
+		func(
+			ctx context.Context,
+			env map[string]string,
+			stdin io.Reader,
+			stdout, stderr io.Writer,
+		) error {
+			return nil
+		},
+	)
 
 	var (
 		nameservers = []string{"8.8.8.8", "1.1.1.1"}
