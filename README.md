@@ -1,11 +1,11 @@
-# Template Library Go
+# runtimeutil-go
 
-[![CI](https://github.com/arhat-dev/template-library-go/workflows/CI/badge.svg)](https://github.com/arhat-dev/template-library-go/actions?query=workflow%3ACI)
-[![PkgGoDev](https://pkg.go.dev/badge/arhat.dev/template-library-go)](https://pkg.go.dev/arhat.dev/template-library-go)
-[![GoReportCard](https://goreportcard.com/badge/arhat.dev/template-library-go)](https://goreportcard.com/report/arhat.dev/template-library-go)
-[![codecov](https://codecov.io/gh/arhat-dev/template-library-go/branch/master/graph/badge.svg)](https://codecov.io/gh/arhat-dev/template-library-go)
+[![CI](https://github.com/arhat-ext/runtimeutil/workflows/CI/badge.svg)](https://github.com/arhat-ext/runtimeutil/actions?query=workflow%3ACI)
+[![PkgGoDev](https://pkg.go.dev/badge/ext.arhat.dev/runtimeutil)](https://pkg.go.dev/ext.arhat.dev/runtimeutil)
+[![GoReportCard](https://goreportcard.com/badge/ext.arhat.dev/runtimeutil)](https://goreportcard.com/report/ext.arhat.dev/runtimeutil)
+[![codecov](https://codecov.io/gh/arhat-ext/runtimeutil/branch/master/graph/badge.svg)](https://codecov.io/gh/arhat-ext/runtimeutil)
 
-Template repo for golang libraries
+Golang utils for runtime extension development
 
 ## LICENSE
 
