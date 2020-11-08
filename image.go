@@ -17,7 +17,6 @@ limitations under the License.
 package runtimeutil
 
 import (
-	"path/filepath"
 	"strings"
 )
 
@@ -33,13 +32,15 @@ func GenerateImageName(defaultDomain, defaultNamespace, name string) string {
 	switch firstSlashIndex {
 	case -1:
 		// no slash, add default registry
-		return filepath.Join(defaultDomain, defaultNamespace, name)
+		return defaultDomain + "/" + defaultNamespace + "/" + name
 	default:
 		prefix := name[:firstSlashIndex]
 		if strings.Contains(prefix, ".") {
+			// contains dot, is a domain name
 			return name
 		}
-		return filepath.Join(defaultDomain, name)
+
+		return defaultDomain + "/" + name
 	}
 }
 
