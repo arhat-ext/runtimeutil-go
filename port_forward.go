@@ -27,7 +27,13 @@ import (
 
 // PortForward
 // TODO: evaluate more efficient way to get network traffic redirected
-func PortForward(ctx context.Context, address, protocol string, port int32, downstream io.ReadWriter) error {
+func PortForward(
+	ctx context.Context,
+	address, protocol string,
+	port int32,
+	upstream io.Reader,
+	downstream io.Writer,
+) error {
 	var (
 		err    error
 		dialer = &net.Dialer{}
@@ -48,9 +54,9 @@ func PortForward(ctx context.Context, address, protocol string, port int32, down
 
 	switch c := conn.(type) {
 	case *net.TCPConn:
-		err = handleTCPPortforward(c, downstream)
+		err = handleTCPPortforward(c, upstream, downstream)
 	case *net.UDPConn:
-		err = handleUDPPortforward(c, downstream)
+		err = handleUDPPortforward(c, upstream, downstream)
 	default:
 		return wellknownerrors.ErrNotSupported
 	}
@@ -62,19 +68,23 @@ func PortForward(ctx context.Context, address, protocol string, port int32, down
 	return nil
 }
 
-func handleTCPPortforward(upstream *net.TCPConn, downstream io.ReadWriter) error {
+func handleTCPPortforward(
+	conn *net.TCPConn,
+	upstream io.Reader,
+	downstream io.Writer,
+) error {
 	// discard any unsent data
-	_ = upstream.SetLinger(0)
+	_ = conn.SetLinger(0)
 
 	go func() {
-		// take advantage of splice syscall
-		if _, err := upstream.ReadFrom(downstream); checkNetError(err) != nil {
+		// take advantage of splice syscall if possible
+		if _, err := conn.ReadFrom(upstream); checkNetError(err) != nil {
 			// TODO: log error
 			_ = err
 		}
 	}()
 
-	if _, err := io.Copy(downstream, upstream); checkNetError(err) != nil {
+	if _, err := io.Copy(downstream, conn); checkNetError(err) != nil {
 		return err
 	}
 
@@ -82,10 +92,12 @@ func handleTCPPortforward(upstream *net.TCPConn, downstream io.ReadWriter) error
 }
 
 func handleUDPPortforward(
-	upstream *net.UDPConn,
-	downstream io.ReadWriter,
+	conn *net.UDPConn,
+	upstream io.Reader,
+	downstream io.Writer,
 ) error {
 	// https://github.com/kubernetes/kubernetes/issues/47862
+	_ = conn
 	_ = upstream
 	_ = downstream
 	return wellknownerrors.ErrNotSupported
