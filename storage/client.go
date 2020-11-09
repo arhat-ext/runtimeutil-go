@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package runtimeutil
+package storage
 
 import (
 	"context"
@@ -37,20 +37,13 @@ var (
 	ErrMountpointInProcess = errors.New("already in process")
 )
 
-type StorageDriver interface {
-	GetMountCmd(remotePath, mountPoint string) []string
-	GetUnmountCmd(mountPoint string) []string
-}
-
-type StorageExitHandleFunc func(remotePath, mountPoint string, err error)
-
-func NewStorageClient(
+func NewClient(
 	ctx context.Context,
-	impl StorageDriver,
+	impl Interface,
 	successTimeWait time.Duration,
 	extraLookupPaths []string,
 	stdoutFile, stderrFile string,
-) (_ *StorageClient, err error) {
+) (_ *Client, err error) {
 	stdout, err := prepareFile(os.Stdout, stdoutFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare stdout file: %w", err)
@@ -70,7 +63,7 @@ func NewStorageClient(
 	tq := queue.NewTimeoutQueue()
 	tq.Start(ctx.Done())
 
-	cli := &StorageClient{
+	cli := &Client{
 		impl: impl,
 
 		successTimeWait:  successTimeWait,
@@ -91,8 +84,8 @@ func NewStorageClient(
 	return cli, nil
 }
 
-type StorageClient struct {
-	impl StorageDriver
+type Client struct {
+	impl Interface
 
 	successTimeWait  time.Duration
 	extraLookupPaths []string
@@ -107,7 +100,7 @@ type StorageClient struct {
 	mu *sync.RWMutex
 }
 
-func (c *StorageClient) routine() {
+func (c *Client) routine() {
 	ch := c.tq.TakeCh()
 	for t := range ch {
 		errCh, ok := t.Data.(chan error)
@@ -126,10 +119,10 @@ func (c *StorageClient) routine() {
 	}
 }
 
-func (c *StorageClient) Mount(
+func (c *Client) Mount(
 	ctx context.Context,
 	remotePath, mountPoint string,
-	onExited StorageExitHandleFunc,
+	onExited ExitHandleFunc,
 ) error {
 	c.mu.Lock()
 	_, mounted := c.mounted[mountPoint]
@@ -217,7 +210,7 @@ func (c *StorageClient) Mount(
 	return nil
 }
 
-func (c *StorageClient) Unmount(ctx context.Context, mountPoint string) error {
+func (c *Client) Unmount(ctx context.Context, mountPoint string) error {
 	c.mu.Lock()
 
 	startedCmd, ok := c.mounted[mountPoint]
@@ -240,7 +233,7 @@ func (c *StorageClient) Unmount(ctx context.Context, mountPoint string) error {
 	return err
 }
 
-func (c *StorageClient) Close() {
+func (c *Client) Close() {
 	_ = c.stdout.Close()
 	_ = c.stderr.Close()
 }
