@@ -35,22 +35,22 @@ options {{- range .Options }} {{ . }} {{- end -}}
 {{ end }}
 `
 
-// DelegateExecFunc execute abbot command with provided environment variables and io channel
-type DelegateExecFunc func(
+// AbbotExecFunc execute abbot command with provided environment variables and io channels
+type AbbotExecFunc func(
 	ctx context.Context,
 	env map[string]string,
 	stdin io.Reader,
 	stdout, stderr io.Writer,
 ) error
 
-func NewNetworkClient(exec DelegateExecFunc) *NetworkClient {
+func NewNetworkClient(exec AbbotExecFunc) *NetworkClient {
 	return &NetworkClient{
 		execAbbot: exec,
 	}
 }
 
 type NetworkClient struct {
-	execAbbot DelegateExecFunc
+	execAbbot AbbotExecFunc
 }
 
 func (c *NetworkClient) CreateResolvConf(nameservers, searches, options []string) ([]byte, error) {
