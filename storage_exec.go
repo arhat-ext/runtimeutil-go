@@ -70,7 +70,7 @@ func GenerateUnmountCmd(binPath string, mountPoint string) []string {
 	}
 }
 
-func ResolveStorageCommand(bin string, args []string, remotePath, localPath string) ([]string, error) {
+func ResolveStorageCommand(bin string, args []string, remotePath, localPath string) []string {
 	command := []string{bin}
 
 	remotePath = filepath.Clean(remotePath)
@@ -90,5 +90,5 @@ func ResolveStorageCommand(bin string, args []string, remotePath, localPath stri
 		}))
 	}
 
-	return command, nil
+	return command
 }

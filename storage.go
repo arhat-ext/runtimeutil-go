@@ -144,8 +144,13 @@ func (c *StorageClient) Mount(
 		return ErrMountpointInProcess
 	}
 
+	cmd := c.impl.GetMountCmd(remotePath, mountPoint)
+	if len(cmd) == 0 {
+		return fmt.Errorf("invalid empty mount command")
+	}
+
 	startedCmd, err := exechelper.Do(exechelper.Spec{
-		Command: c.impl.GetMountCmd(remotePath, mountPoint),
+		Command: cmd,
 
 		Stdout: c.stdout,
 		Stderr: c.stderr,
@@ -227,6 +232,9 @@ func (c *StorageClient) Unmount(ctx context.Context, mountPoint string) error {
 	_ = startedCmd.Release()
 
 	cmd := c.impl.GetUnmountCmd(mountPoint)
+	if len(cmd) == 0 {
+		return fmt.Errorf("invalid empty unmount command")
+	}
 
 	_, err := exechelper.DoHeadless(cmd, nil)
 	return err
