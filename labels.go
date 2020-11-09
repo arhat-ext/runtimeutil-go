@@ -1,5 +1,3 @@
-// +build !rt_none
-
 /*
 Copyright 2020 The arhat.dev Authors.
 
