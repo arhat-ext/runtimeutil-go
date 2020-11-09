@@ -37,7 +37,7 @@ var (
 	ErrMountpointInProcess = errors.New("already in process")
 )
 
-type StorageEngine interface {
+type StorageDriver interface {
 	GetMountCmd(remotePath, mountPoint string) []string
 	GetUnmountCmd(mountPoint string) []string
 }
@@ -46,7 +46,7 @@ type StorageExitHandleFunc func(remotePath, mountPoint string, err error)
 
 func NewStorageClient(
 	ctx context.Context,
-	impl StorageEngine,
+	impl StorageDriver,
 	successTimeWait time.Duration,
 	extraLookupPaths []string,
 	stdoutFile, stderrFile string,
@@ -92,7 +92,7 @@ func NewStorageClient(
 }
 
 type StorageClient struct {
-	impl StorageEngine
+	impl StorageDriver
 
 	successTimeWait  time.Duration
 	extraLookupPaths []string
