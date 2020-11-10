@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package runtimeutil
+package network
 
 import (
 	"context"
@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNetworkClient_CreateResolvConf(t *testing.T) {
-	client := NewNetworkClient(
+func TestClient_CreateResolvConf(t *testing.T) {
+	client := NewClient(
 		func(
 			ctx context.Context,
 			env map[string]string,

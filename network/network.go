@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package runtimeutil
+package network
 
 import (
 	"bytes"
@@ -43,17 +43,17 @@ type AbbotExecFunc func(
 	stdout, stderr io.Writer,
 ) error
 
-func NewNetworkClient(exec AbbotExecFunc) *NetworkClient {
-	return &NetworkClient{
+func NewClient(exec AbbotExecFunc) *Client {
+	return &Client{
 		execAbbot: exec,
 	}
 }
 
-type NetworkClient struct {
+type Client struct {
 	execAbbot AbbotExecFunc
 }
 
-func (c *NetworkClient) CreateResolvConf(nameservers, searches, options []string) ([]byte, error) {
+func (c *Client) CreateResolvConf(nameservers, searches, options []string) ([]byte, error) {
 	resolvTemplate, err := template.New("").Parse(resolvConfTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse resolv.conf template")
@@ -80,7 +80,8 @@ func (c *NetworkClient) CreateResolvConf(nameservers, searches, options []string
 	return buf.Bytes(), nil
 }
 
-func (c *NetworkClient) Do(
+// Do host/container network operation by executing abbot command
+func (c *Client) Do(
 	ctx context.Context,
 	abbotReqData []byte,
 	pid int64,
@@ -111,7 +112,8 @@ func (c *NetworkClient) Do(
 	return buf.Bytes(), nil
 }
 
-func (c *NetworkClient) Restore(
+// Restore container network by executing abbot command
+func (c *Client) Restore(
 	ctx context.Context, pid int64, containerID string,
 ) error {
 	errBuf := new(bytes.Buffer)
@@ -138,7 +140,8 @@ func (c *NetworkClient) Restore(
 	return nil
 }
 
-func (c *NetworkClient) Query(ctx context.Context, pid int64, containerID string) ([]byte, error) {
+// Query container network by executing abbot command
+func (c *Client) Query(ctx context.Context, pid int64, containerID string) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	errBuf := new(bytes.Buffer)
 
@@ -165,7 +168,8 @@ func (c *NetworkClient) Query(ctx context.Context, pid int64, containerID string
 	return buf.Bytes(), nil
 }
 
-func (c *NetworkClient) Delete(ctx context.Context, pid int64, containerID string) error {
+// Delete container network by executing abbot command
+func (c *Client) Delete(ctx context.Context, pid int64, containerID string) error {
 	errBuf := new(bytes.Buffer)
 	err := c.execAbbot(
 		ctx,
