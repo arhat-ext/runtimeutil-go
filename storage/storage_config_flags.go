@@ -28,7 +28,7 @@ func FlagsForClient(prefix string, config *ClientConfig) *pflag.FlagSet {
 	fs := pflag.NewFlagSet("storage.client", pflag.ExitOnError)
 
 	fs.StringVar(&config.Driver, prefix+"driver",
-		"none", "set storage driver to use",
+		"", "set storage driver to use",
 	)
 
 	fs.StringVar(&config.StdoutFile, prefix+"stdoutFile", "stdout", "set command stdout file")

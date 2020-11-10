@@ -32,7 +32,7 @@ type bundle struct {
 
 var (
 	supportedDrivers = map[string]*bundle{
-		"none": {
+		"": {
 			f: func(interface{}) (Interface, error) {
 				return &NopDriver{}, nil
 			},
@@ -48,8 +48,8 @@ func Register(name string, f FactoryFunc, cf ConfigFactoryFunc) {
 		return
 	}
 
-	// reserved
-	if name == "none" {
+	// reserve empty name
+	if name == "" {
 		return
 	}
 
@@ -62,7 +62,7 @@ func Register(name string, f FactoryFunc, cf ConfigFactoryFunc) {
 func NewConfig(name string) (interface{}, error) {
 	b, ok := supportedDrivers[name]
 	if !ok {
-		return nil, fmt.Errorf("not found")
+		return nil, fmt.Errorf("driver %q not found", name)
 	}
 
 	return b.cf(), nil
@@ -71,7 +71,7 @@ func NewConfig(name string) (interface{}, error) {
 func NewDriver(name string, config interface{}) (Interface, error) {
 	b, ok := supportedDrivers[name]
 	if !ok {
-		return nil, fmt.Errorf("not found")
+		return nil, fmt.Errorf("driver %q not found", name)
 	}
 
 	return b.f(config)

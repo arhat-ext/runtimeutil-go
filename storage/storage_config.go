@@ -84,14 +84,15 @@ func unmarshalClientConfig(m map[string]interface{}, c *ClientConfig) error {
 		return fmt.Errorf("driver type must be a string")
 	}
 
+	var err error
+	c.DriverConfig, err = NewConfig(driverName)
+	if err != nil {
+		return fmt.Errorf("unknown driver %q: %w", driverName, err)
+	}
+
 	configData, err := json.Marshal(m)
 	if err != nil {
 		return fmt.Errorf("failed to get driver config bytes: %w", err)
-	}
-
-	c.DriverConfig, err = NewConfig(driverName)
-	if err != nil {
-		return fmt.Errorf("unknown driver %s: %w", driverName, err)
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(configData))
