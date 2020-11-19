@@ -3,7 +3,7 @@ module ext.arhat.dev/runtimeutil
 go 1.15
 
 require (
-	arhat.dev/aranya-proto v0.2.4
+	arhat.dev/aranya-proto v0.2.5
 	arhat.dev/pkg v0.4.4
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/spf13/pflag v1.0.5
