@@ -3,13 +3,15 @@ module ext.arhat.dev/runtimeutil
 go 1.15
 
 require (
-	arhat.dev/aranya-proto v0.2.5
-	arhat.dev/pkg v0.4.4
+	arhat.dev/aranya-proto v0.2.6
+	arhat.dev/pkg v0.4.5
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )
+
+replace github.com/creack/pty => github.com/jeffreystoke/pty v1.1.12-0.20201126201855-c1c1e24408f9
 
 replace (
 	k8s.io/api => github.com/kubernetes/api v0.19.4
