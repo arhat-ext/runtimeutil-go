@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	arhat.dev/aranya-proto v0.3.2
-	arhat.dev/pkg v0.5.1
+	arhat.dev/pkg v0.5.2
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
